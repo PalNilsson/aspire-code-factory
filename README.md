@@ -15,7 +15,7 @@ optional pack, and the **PanDA Pilot** factory is the first worked example.
 ## How it works
 
 ```mermaid
-flowchart LR
+flowchart TD
     T(["Trigger: GitHub, AskPanDA, chat"]) --> R["route"]
     R --> TR["triage"]
     R -.->|"clear-cut"| I
