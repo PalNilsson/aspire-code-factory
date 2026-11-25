@@ -15,35 +15,65 @@ optional pack, and the **PanDA Pilot** factory is the first worked example.
 ## How it works
 
 ```mermaid
+%%{init: {"flowchart": {"curve": "basis", "nodeSpacing": 40, "rankSpacing": 45}}}%%
 flowchart TD
-    T(["Trigger: GitHub, AskPanDA, chat"]) --> R["route"]
-    R --> TR["triage"]
-    R -.->|"clear-cut"| I
-    TR -->|"needs spec"| S["spec 👤"]
-    TR -.->|"small and clear"| I["implement"]
-    S -->|"approved"| I
-    I --> RV["review"]
-    RV -.->|"changes required"| I
-    RV -->|"approve"| V["validate"]
-    RV -.->|"needs judgement"| D
-    V -.->|"failed"| I
-    V -->|"passed"| D["deliver: report or PR 👤"]
-    classDef future stroke-dasharray: 5 5
+    T(["📥 <b>Trigger</b><br/>GitHub · AskPanDA · chat"])
+    R{{"🧭 <b>route</b><br/>fixed rules, no model"}}
+    TR["🔍 <b>triage</b><br/>investigate and size"]
+    S["📝 <b>spec</b><br/>👤 human approval"]
+    I["🛠️ <b>implement</b><br/>change and verify"]
+    RV["🔎 <b>review</b><br/>independent model"]
+    V["🧪 <b>validate</b><br/>real environment + control"]
+    D["📦 <b>deliver</b><br/>report or PR · 👤 merge"]
+
+    T --> R
+    R --> TR
+    R -.->|clear-cut| I
+    TR -->|needs spec| S
+    TR -.->|small and clear| I
+    S -->|approved| I
+    I --> RV
+    RV -.->|changes required| I
+    RV -->|approve| V
+    RV -.->|needs judgement| D
+    V -.->|failed| I
+    V -->|passed| D
+
+    classDef trigger fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    classDef rule fill:#f3f4f6,stroke:#6b7280,stroke-width:1.5px,color:#111827
+    classDef agent fill:#e0f2f1,stroke:#0f766e,stroke-width:1.5px,color:#134e4a
+    classDef human fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#78350f
+    classDef future fill:#f5f3ff,stroke:#7c3aed,stroke-width:1.5px,stroke-dasharray:6 4,color:#4c1d95
+
+    class T trigger
+    class R rule
+    class TR,I,RV agent
+    class S,D human
     class V future
+
+    linkStyle 2,4,9 stroke:#9ca3af,stroke-width:1.5px
+    linkStyle 7,10 stroke:#dc2626,stroke-width:1.5px
 ```
 
 A trigger becomes a task. The **router** uses fixed rules, not a model: it
 sends clear-cut work straight to implement and everything else to
 **triage**. Triage sends larger or ambiguous work to **spec**, which a human
-approves (👤). The builder **implements** and verifies the change. The
+approves. The builder **implements** and verifies the change. The
 **reviewer**, a different model family from the builder, approves it, sends
 clear problems back, or passes open questions on to a human. **Validate**
-(dashed box: a possible future stage) runs the change in a real environment
-next to a control run; without it, approved work goes straight to deliver.
-**Deliver** produces a report, a pull request or both, and a human decides
-whether to merge (👤).
+runs the change in a real environment next to a control run; without it,
+approved work goes straight to deliver. **Deliver** produces a report, a
+pull request or both, and a human decides whether to merge.
 
-Solid arrows are the main path; dashed arrows are shortcuts and loops back.
+| Colour | Meaning |
+|---|---|
+| Blue | Where work enters |
+| Grey | Deterministic step, no model |
+| Teal | Agent stage |
+| Amber | Stage with a human decision (👤) |
+| Purple, dashed | Possible future stage |
+
+Grey dashed arrows are shortcuts; red arrows send work back to implement.
 Loops are capped, every task has a budget, and any stage can escalate to a
 human (not drawn). Details: [stages](docs/stages.md).
 
