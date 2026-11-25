@@ -12,6 +12,45 @@ and merge.
 The core is generic and works on any repository. PanDA support comes as an
 optional pack, and the **PanDA Pilot** factory is the first worked example.
 
+## How it works
+
+```mermaid
+flowchart LR
+    T(["Trigger: GitHub, AskPanDA, chat"]) --> R["route"]
+    R --> TR["triage"]
+    R -.->|"clear-cut"| I
+    TR -->|"needs spec"| S["spec 👤"]
+    TR -.->|"small and clear"| I["implement"]
+    S -->|"approved"| I
+    I --> RV["review"]
+    RV -.->|"changes required"| I
+    RV -->|"approve"| V["validate"]
+    RV -.->|"needs judgement"| D
+    V -.->|"failed"| I
+    V -->|"passed"| D["deliver: report or PR 👤"]
+    classDef future stroke-dasharray: 5 5
+    class V future
+```
+
+A trigger becomes a task. The **router** uses fixed rules, not a model: it
+sends clear-cut work straight to implement and everything else to
+**triage**. Triage sends larger or ambiguous work to **spec**, which a human
+approves (👤). The builder **implements** and verifies the change. The
+**reviewer**, a different model family from the builder, approves it, sends
+clear problems back, or passes open questions on to a human. **Validate**
+(dashed box: a possible future stage) runs the change in a real environment
+next to a control run; without it, approved work goes straight to deliver.
+**Deliver** produces a report, a pull request or both, and a human decides
+whether to merge (👤).
+
+Solid arrows are the main path; dashed arrows are shortcuts and loops back.
+Loops are capped, every task has a budget, and any stage can escalate to a
+human (not drawn). Details: [stages](docs/stages.md).
+
+Compared with the generic factory loop this project started from, ASPIRE adds
+the deterministic router, the validate stage and the report as an
+alternative to a pull request, and requires an independent reviewer.
+
 **Status:** Phase 0 — design. No code yet.
 
 ## Documentation
